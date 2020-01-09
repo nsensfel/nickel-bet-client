@@ -1,59 +1,35 @@
 ################################################################################
 ## CONFIG ######################################################################
 ################################################################################
-MODULES ?= css asset
-
-SRC_DIR = ${CURDIR}/src
-WWW_DIR = ${CURDIR}/www
+CONFIG_FILE ?= ${CURDIR}/conf/constants.conf
 
 ################################################################################
 ## MAKEFILE MAGIC ##############################################################
 ################################################################################
-MODULES_SRC = $(addprefix $(SRC_DIR)/,$(MODULES))
-MODULES_WWW = $(addprefix $(WWW_DIR)/,$(MODULES))
+PREPROCESSOR_FILES = $(shell find ${CURDIR} -name "*.m4")
+PREPROCESSED_FILES = $(patsubst %.m4,%,$(PREPROCESSOR_FILES))
+
+MAKEFILE_TO_M4 = \
+	--define=__MAKEFILE_DATA_DIR=$(DATA_DIR) \
+	--define=__CODE_STYLE=json
 
 ################################################################################
 ## SANITY CHECKS ###############################################################
 ################################################################################
-
-################################################################################
-## INCLUDES ####################################################################
-################################################################################
-main_target: all
-
-include ${CURDIR}/mk/preprocessor.mk
+ifeq ($(wildcard $(CONFIG_FILE)),)
+$(error "Missing CONFIG_FILE ($(CONFIG_FILE)), use the example to make one.")
+endif
 
 ################################################################################
 ## TARGET RULES ################################################################
 ################################################################################
-all: $(PREPROCESSOR_RESULT) build $(WWW_DIR) $(MODULES_WWW)
-
-upload:
-	$(MAKE)
-	rsync -avz -L -e "ssh" $(WWW_DIR) procyon_:/nickel_bet_static_content/
-
-build:
-	for module in $(MODULES_SRC) ; do \
-		$(MAKE) -C $$module build ; \
-	done
-
-clean:
-	for module in $(MODULES_SRC) ; do \
-		$(MAKE) -C $$module clean ; \
-	done
-	rm -f $(PREPROCESSED_FILES)
-
-reset:
-	$(MAKE) clean
-	for module in $(MODULES_SRC) ; do \
-		$(MAKE) -C $$module reset; \
-	done
+PREPROCESSOR_RESULT = $(PREPROCESSED_FILES)
 
 ################################################################################
 ## INTERNAL RULES ##############################################################
 ################################################################################
-$(MODULES_WWW): %:
-	ln -s $(SRC_DIR)/$(patsubst $(WWW_DIR)/%,%,$@)/www/ $@
+$(PREPROCESSED_FILES): %: %.m4 .PHONY
+	m4 -P $(MAKEFILE_TO_M4) $(CONFIG_FILE) $< > $@
 
-$(WWW_DIR):
-	mkdir -p $@
+.PHONY:
+
