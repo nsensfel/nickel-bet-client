@@ -1,0 +1,31 @@
+@import '../shared/font/sage_sans.scss';
+
+.challenge_body
+{
+   position: absolute;
+   left: 6em;
+   bottom: 6em;
+   top: 6em;
+   right: 6em;
+   background-color: lightgrey;
+   border-radius: 2em;
+   border: 0.1em solid grey;
+}
+
+body
+{
+   background-margin: 4em;
+   background-image:
+      url(/asset/svg/header_top_left.svg),
+      url(/asset/svg/header_top_right.svg);
+   background-position: left 1.5em top 1.5em, right 1.5em bottom 1.5em;
+   background-repeat: no-repeat;
+}
+
+.challenge_message
+{
+   font-family: 'SageSans';
+   font-size: 2em;
+   margin: 1em;
+   text-align: center;
+}
