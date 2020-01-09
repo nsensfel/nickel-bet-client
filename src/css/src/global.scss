@@ -1,0 +1,15 @@
+.global_header
+{
+   top: 0;
+   left: 0;
+   right: 0;
+   width: 100%;
+   height: 5em;
+   background-color: white;
+   background-image:
+      url(/asset/svg/header_top_left.svg),
+      url(/asset/svg/header_top_left.svg);
+   background-position:
+      left top,
+      right bottom;
+}
